@@ -71,7 +71,7 @@ export default {
 			maxRacesReached: "Maximale Anzahl Rennen erreicht.",
 			captureCancelled: "Aufnahme abgebrochen",
 			noScoreboardDetected: "Kein Ergebnisscreen erkannt — bitte den Ergebnisscreen erfassen.",
-			noPauseScreenDetected: "Keine Namen gefunden — bitte den Pausebildschirm öffnen.",
+			noPauseScreenDetected: "Automatisches Ausfüllen fehlgeschlagen — bitte den Pausebildschirm mit mindestens 10 anwesenden Spielern öffnen.",
 			ocrFailed: "OCR fehlgeschlagen. Details in der Konsole.",
 			raceSaved: "Rennen {number} gespeichert!"
 		},

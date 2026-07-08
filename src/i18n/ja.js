@@ -66,7 +66,7 @@ export default {
 			maxRacesReached: 'レース数の上限に達しました。',
 			captureCancelled: 'キャプチャをキャンセルしました',
 			noScoreboardDetected: 'リザルト画面を検出できませんでした。リザルト画面をキャプチャしてください。',
-			noPauseScreenDetected: '名前が検出されません。ポーズ画面を開いてください。',
+			noPauseScreenDetected: '自動入力に失敗しました。10人以上のプレイヤーがいる状態でポーズ画面を開いてください。',
 			ocrFailed: 'OCRに失敗しました。詳細はコンソールをご確認ください。',
 			raceSaved: 'レース {number} を保存しました！'
 		},

@@ -71,7 +71,7 @@ export default {
 			maxRacesReached: "Nombre maximal de courses atteint.",
 			captureCancelled: "Capture annulée",
 			noScoreboardDetected: "Aucun tableau de scores détecté — capturez l'écran des résultats.",
-			noPauseScreenDetected: "Aucun nom trouvé — ouvrez l'écran Pause.",
+			noPauseScreenDetected: "Échec du remplissage automatique — ouvrez l'écran Pause avec au moins 10 joueurs présents.",
 			ocrFailed: "Échec de l'OCR. Voir la console pour plus de détails.",
 			raceSaved: "Course {number} enregistrée !"
 		},

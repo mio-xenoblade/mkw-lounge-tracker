@@ -68,7 +68,7 @@ export default {
 			maxRacesReached: "You have reached the maximum number of races.",
 			captureCancelled: "Capture cancelled",
 			noScoreboardDetected: "No scoreboard detected — try capturing on the results screen.",
-			noPauseScreenDetected: "No names detected — ensure Pause screen is open.",
+			noPauseScreenDetected: "Auto-fill failed — ensure Pause screen is open with at least 10 players present.",
 			ocrFailed: "OCR failed. See console for details.",
 			raceSaved: "Race {number} saved!"
 		},
