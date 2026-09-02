@@ -15,7 +15,10 @@ export class Mogi extends EventTarget {
 
 	get size() { return this.#races.length; }
 	get ended() { return this.#races.length >= RACE_COUNT; }
-	get maxScore() { return POINTS_BY_PLACEMENT_24P.reduce((a, b) => a + b) * RACE_COUNT; }
+	get maxScore() { 
+		const points = this.#roster.is24p ? POINTS_BY_PLACEMENT_24P : POINTS_BY_PLACEMENT_12P; 
+		return points.reduce((a, b) => a + b) * RACE_COUNT;
+	}
 
 	/** @type {number} */
 	#startTime = Date.now();
