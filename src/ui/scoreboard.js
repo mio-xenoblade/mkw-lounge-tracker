@@ -51,8 +51,10 @@ export function connectScoreboard(scoreTable, video, mogi) {
 		const tbody = document.createElement('tbody');
 		tbody.classList.toggle('team-mode', mogi.playersPerTeam > 1);
 		let team = null;
-		for (const p of roster) {
+		for (const [index, p] of roster.entries()) {
 			const tr = document.createElement('tr');
+			// changes background to red of bottom half instead of all rows after 7th
+			tr.classList = (index >= Math.ceil(roster.length / 2)) ? 'bottom-half' : '';
 			const teamScore = totalsPerTeam.get(p.seed) || 0;
 			const playerScore = totals.get(p.id) || 0;
 			const teamRank = teamScore > 0 ? Array.from(totalsPerTeam.values()).filter(x => x > teamScore).length + 1 : 0;

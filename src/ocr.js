@@ -103,10 +103,10 @@ function generateRowRects(p) {
 export const OCR_GRID = {
 	canvasWidth: 1920,
 	canvasHeight: 1080,
-	nameRects: generateRowRects({ count: 12, startY: 40, rowHeight: 77, vPad: 15, x: 1270, w: 340 }),
+	nameRects: generateRowRects({ count: 12, startY: 40+77, rowHeight: 77, vPad: 15, x: 1270, w: 340 }),
 	pauseRects: [
-		...generateRowRects({ count: 6, startY: 90, rowHeight: 76, vPad: 15, x: 260, w: 240 }),
-		...generateRowRects({ count: 6, startY: 90, rowHeight: 76, vPad: 15, x: 670, w: 240 }),
+		...generateRowRects({ count: 12, startY: 90, rowHeight: 76, vPad: 15, x: 260, w: 240 }),
+		...generateRowRects({ count: 12, startY: 90, rowHeight: 76, vPad: 15, x: 670, w: 240 }),
 	]
 };
 
