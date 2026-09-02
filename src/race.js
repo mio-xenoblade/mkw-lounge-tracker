@@ -1,4 +1,5 @@
-export const POINTS_BY_PLACEMENT = [15,12,10,9,8,7,6,5,4,3,2,1];
+export const POINTS_BY_PLACEMENT_12P = [15,12,10,9,8,7,6,5,4,3,2,1];
+export const POINTS_BY_PLACEMENT_24P = [15,12,10,9,9,8,8,7,7,6,6,6,5,5,5,4,4,4,3,3,3,2,2,1];
 
 export class Placement {
 	/** @type {number} */ #placement;
@@ -19,6 +20,9 @@ export class Placement {
 	/** @type {boolean} */ #dc;
 	get dc() { return this.#dc; }
 
+	/** @type {boolean} */ #is24p;
+	get is24p() { return this.#is24p; }
+
 	/**
 	 * @param {number} placement
 	 * @param {(string|null)} playerId
@@ -26,14 +30,16 @@ export class Placement {
 	 * @param {string} ocrText
 	 * @param {number} ocrConfidence
 	 * @param {boolean} dc
+	 * @param {boolean} is24p
 	 */
-	constructor(placement, playerId, resolvedName, ocrText, ocrConfidence, dc) {
+	constructor(placement, playerId, resolvedName, ocrText, ocrConfidence, dc, is24p) {
 		this.#placement = placement;
 		this.#playerId = playerId;
 		this.#resolvedName = resolvedName;
 		this.#ocrText = ocrText;
 		this.#ocrConfidence = ocrConfidence;
 		this.#dc = dc;
+		this.#is24p = is24p;
 	}
 
 	/**
@@ -41,7 +47,7 @@ export class Placement {
 	 * @param {string} resolvedName
 	 */
 	withPlayerIdAndResolvedName(playerId, resolvedName) {
-		return new Placement(this.#placement, playerId, resolvedName, this.#ocrText, this.#ocrConfidence, this.#dc);
+		return new Placement(this.#placement, playerId, resolvedName, this.#ocrText, this.#ocrConfidence, this.#dc, this.#is24p);
 	}
 
 	/**
@@ -49,12 +55,13 @@ export class Placement {
 	 * @param {boolean} dc
 	 */
 	withPlacement(placement, dc) {
-		return new Placement(placement, this.#playerId, this.#resolvedName, this.#ocrText, this.#ocrConfidence, dc);
+		return new Placement(placement, this.#playerId, this.#resolvedName, this.#ocrText, this.#ocrConfidence, dc, this.#is24p);
 	}
 
 	get score() {
 		if (this.#dc) return 1;
-		return POINTS_BY_PLACEMENT[this.#placement - 1] ?? 0;
+		if (this.is24p) return POINTS_BY_PLACEMENT_24P[this.#placement - 1] ?? 0;
+		return POINTS_BY_PLACEMENT_12P[this.#placement - 1] ?? 0;
 	}
 }
 

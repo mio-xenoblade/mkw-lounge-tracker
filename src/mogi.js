@@ -1,5 +1,5 @@
 import { Roster } from './roster.js';
-import { Placement, POINTS_BY_PLACEMENT, Race } from './race.js';
+import { Placement, POINTS_BY_PLACEMENT_12P, POINTS_BY_PLACEMENT_24P, Race } from './race.js';
 import { info, success } from './ui/toast.js';
 import { onLocaleChange, t } from './i18n/i18n.js';
 import { Team } from './team.js';
@@ -15,7 +15,7 @@ export class Mogi extends EventTarget {
 
 	get size() { return this.#races.length; }
 	get ended() { return this.#races.length >= RACE_COUNT; }
-	get maxScore() { return POINTS_BY_PLACEMENT.reduce((a, b) => a + b) * RACE_COUNT; }
+	get maxScore() { return POINTS_BY_PLACEMENT_24P.reduce((a, b) => a + b) * RACE_COUNT; }
 
 	/** @type {number} */
 	#startTime = Date.now();

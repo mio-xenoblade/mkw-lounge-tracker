@@ -259,7 +259,7 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 
 	// Prepare normalized data
 	const rosterArray = [...roster];
-	const placements = rawRows.map((row, i) => new Placement(i + 1, null, row.text, row.text, Math.round(row.confidence), false));
+	const placements = rawRows.map((row, i) => new Placement(i + 1, null, row.text, row.text, Math.round(row.confidence), false, roster.is24p));
 	const normRows = rawRows.map(r => normalizeName(r.text));
 
 	// Early exit if 2+ blanks
@@ -272,7 +272,7 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	}
 
 	// Build an integer cost matrix: players (rows) × OCR rows (cols)
-	const N = rosterArray.length; // expect 12
+	const N = 12; // expect 12
 	const isBlankCol = normRows.map(s => !s);
 
 	// Use IGN if available, else roster name, for each player

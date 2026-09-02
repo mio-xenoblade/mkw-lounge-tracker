@@ -3,7 +3,7 @@
 import { t } from "./i18n/i18n.js";
 import { normalizeName, Player } from "./player.js";
 
-export const ROSTER_SIZE = 12;
+export const ROSTER_SIZE = 24;
 
 export class Roster {
 	/** @type {string} */
@@ -34,6 +34,7 @@ export class Roster {
 
 	get size() { return this.#roster.length; }
 	get full() { return this.#roster.length === ROSTER_SIZE; }
+	get is24p() { return this.#roster.length === 24; }
 	[Symbol.iterator]() { return this.#roster.toSorted((a, b) => a.seed - b.seed)[Symbol.iterator](); }
 
 	/** @param {string} id */
