@@ -4,7 +4,7 @@
 import { fmt, t } from "../i18n/i18n.js";
 import { ROSTER_SIZE } from "../roster.js";
 
-const MAX_DC_SLOTS = 2;
+const MAX_DC_SLOTS = 4;
 
 function makeDialog() {
 	const dialog = document.createElement('dialog');
@@ -12,11 +12,7 @@ function makeDialog() {
 		<form method="dialog" class="modal">
 			<h3>${t('editRace.title')}</h3>
 			<div class="grid" style="grid-template-columns: 1fr 220px;">
-				<div>
-					<a href="#" class="race-screenshot" target="_blank" rel="noopener noreferrer">
-						<img src="" alt="${t('gallery.imageAltText', { number: 1 })}" />
-					</a>
-				</div>
+				<div class="race-screenshots"></div>
 				<div class="editrace-list">
 					${Array.from({length:ROSTER_SIZE}).map((_, i) => `<label>
 						<input type="checkbox" />
@@ -54,14 +50,13 @@ function makeDialog() {
 		}
 	});
 	const slots = /** @type {HTMLElement[]} */([...dialog.querySelectorAll('div.editrace-list label')]);
-	const screenshotLink = /** @type {HTMLAnchorElement} */(dialog.querySelector('a.race-screenshot'));
-	const screenshotImage = /** @type {HTMLImageElement} */(dialog.querySelector('a.race-screenshot img'));
+	const screenshots = /** @type {HTMLDivElement} */(dialog.querySelector('div.race-screenshots'));
 	const save = /** @type {HTMLButtonElement} */(dialog.querySelector('button[value=save]'));
 	const cancel = /** @type {HTMLButtonElement} */(dialog.querySelector('button[value=cancel]'));
 	const del = /** @type {HTMLButtonElement} */(dialog.querySelector('button[value=delete]'));
 	document.body.append(dialog);
 	dialog.addEventListener('close', () => dialog.remove());
-	return { dialog, slots, screenshotLink, screenshotImage, save, cancel, del };
+	return { dialog, slots, screenshots, save, cancel, del };
 }
 
 /**
@@ -71,10 +66,22 @@ function makeDialog() {
 export function openEditRace(mogi, idx) {
 	const race = mogi.races[idx];
 	if( !race) return;
-	const { dialog, slots, screenshotLink, screenshotImage, save, cancel, del } = makeDialog();
+	const { dialog, slots, screenshots, save, cancel, del } = makeDialog();
 
-	screenshotLink.href = screenshotImage.src = race.snapshotUrl;
-	screenshotImage.alt = t('gallery.imageAltText', { number: idx + 1 });
+	race.snapshotUrls.forEach((url, i) => {
+		const link = document.createElement('a');
+		link.href = url;
+		link.className = 'race-screenshot';
+		link.target = '_blank';
+		link.rel = 'noopener noreferrer';
+	
+		const image = document.createElement('img');
+		image.src = url;
+		image.alt = t('gallery.imageAltText', { number: `${idx + 1}-${i + 1}` });
+
+		link.append(image);
+		screenshots.append(link);
+	});
 
 	let dcCount = 0;
 	// Build per-player selects. Preselect from current placements.
@@ -131,7 +138,9 @@ export function openEditRace(mogi, idx) {
 
 	del.addEventListener('click', () => {
 		if (!confirm(t('editRace.confirmDelete'))) return;
-		try { URL.revokeObjectURL(race.snapshotUrl); } catch { }
+		for (const url of race.snapshotUrls) {
+			try { URL.revokeObjectURL(url); } catch { }
+		}
 
 		dialog.close();
 		mogi.deleteRace(idx);

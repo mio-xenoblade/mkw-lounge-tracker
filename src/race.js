@@ -1,5 +1,6 @@
 export const POINTS_BY_PLACEMENT_12P = [15,12,10,9,8,7,6,5,4,3,2,1];
 export const POINTS_BY_PLACEMENT_24P = [15,12,10,9,9,8,8,7,7,6,6,6,5,5,5,4,4,4,3,3,3,2,2,1];
+export const POINTS_BY_PLACEMENT_KO_TOUR_SQ = [30,26,23,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
 
 export class Placement {
 	/** @type {number} */ #placement;
@@ -72,23 +73,23 @@ export class Race {
 	/** @type {Placement[]} */ #placements;
 	get placements() { return [...this.#placements]; }
 
-	/** @type {string} */ #snapshotUrl;
-	get snapshotUrl() { return this.#snapshotUrl; }
+	/** @type {string[]} */ #snapshotUrls;
+	get snapshotUrls() { return this.#snapshotUrls; }
 
 	/**
 	 * @param {number} timestamp
 	 * @param {Placement[]} placements
-	 * @param {string} snapshotUrl
+	 * @param {string[]} snapshotUrls
 	 */
-	constructor(timestamp, placements, snapshotUrl) {
+	constructor(timestamp, placements, ...snapshotUrls) {
 		this.#timestamp = timestamp;
 		this.#placements = placements;
-		this.#snapshotUrl = snapshotUrl;
+		this.#snapshotUrls = snapshotUrls;
 	}
 
 	/** @param {Placement[]} placements */
 	withPlacements(placements) {
-		return new Race(this.#timestamp, placements, this.#snapshotUrl);
+		return new Race(this.#timestamp, placements, ...this.#snapshotUrls);
 	}
 
 	/** @returns {Map<string,number>} Player ID => Score */

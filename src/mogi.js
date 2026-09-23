@@ -1,4 +1,4 @@
-import { Roster, ROSTER_SIZE } from './roster.js';
+import { Roster } from './roster.js';
 import { Placement, POINTS_BY_PLACEMENT_12P, POINTS_BY_PLACEMENT_24P, Race } from './race.js';
 import { info, success } from './ui/toast.js';
 import { onLocaleChange, t } from './i18n/i18n.js';

@@ -72,11 +72,13 @@ async function createSessionZip(mogi) {
 	const races = mogi.races;
 	for (let i=0; i<races.length; i++) {
 		const r = races[i];
-		const num = String(i+1).padStart(2, '0');
-		const jpegName = `races/race-${num}.jpg`;
-		const res = await fetch(r.snapshotUrl);
-		const blob = await res.blob();
-		zip.file(jpegName, blob, { date: new Date(r.timestamp) });
+		for(let j=0; j<r.snapshotUrls.length; j++){
+			const num = String(i+1).padStart(2, '0');
+			const jpegName = `races/race-${num}-${j+1}.jpg`;
+			const res = await fetch(r.snapshotUrls[j]);
+			const blob = await res.blob();
+			zip.file(jpegName, blob, { date: new Date(r.timestamp) });
+		}
 	}
 
 	// -- build ZIP
