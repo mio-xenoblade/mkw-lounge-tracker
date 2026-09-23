@@ -76,20 +76,49 @@ export function snapshotBlobUrlFromCanvas(base) {
 }
 
 /**
+ * only need placements for now, but eventually want to add the screenshot aswell
+ * @type {Race | null}
+ */
+let temp24playerresults = null;
+/**
  * Capture a frame and OCR the results screen.
  * @param {HTMLVideoElement} video
  * @param {Mogi} mogi
  */
 export async function captureResultsScreen(video, mogi) {
 	try {
-		const base = captureFrame(video);
-		// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-		const placements = await processResultsScreen(base, OCR_GRID.nameRects, mogi.roster, mogi.playersPerTeam >= 3);
-		// Only if successful, make the snapshot and push the race
-		const snapshotUrl = await snapshotBlobUrlFromCanvas(base);
-		const race = new Race(Date.now(), placements, snapshotUrl);
-		mogi.roster.lockIGNsFromPlacements(placements);
-		mogi.addRace(race);
+		if (temp24playerresults !== null) {
+			// this is second half of 24p
+			const base = captureFrame(video);
+			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, mogi.playersPerTeam >= 3);
+			const combinedPlacements = [
+				...temp24playerresults.placements,
+				...placements.map(place => place.withPlacement(place.placement + 12, place.dc))
+				
+			];
+			// Only if successful, make the snapshot and push the race
+			const snapshotUrlBottom12 = await snapshotBlobUrlFromCanvas(base);
+			const totalResults = new Race(Date.now(), combinedPlacements, snapshotUrlBottom12);
+			temp24playerresults = null;
+			mogi.roster.lockIGNsFromPlacements(placements)
+			mogi.addRace(totalResults)
+		}
+		else {
+			const base = captureFrame(video);
+			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsTop12, mogi.roster, mogi.playersPerTeam >= 3);
+			// Only if successful, make the snapshot and push the race
+			const snapshotUrlTop12 = await snapshotBlobUrlFromCanvas(base);
+			const race = new Race(Date.now(), placements, snapshotUrlTop12);
+			if (mogi.roster.is24p) {
+				temp24playerresults = race;
+				info('Captured 12/24, please capture second half')
+				return;
+			}
+			mogi.roster.lockIGNsFromPlacements(placements);
+			mogi.addRace(race);
+		}
 	} catch (e) {
 		// If the user canceled manual resolve, just abort quietly
 		if (/** @type {any} */(e)?.code === 'MANUAL_CANCELLED') {
