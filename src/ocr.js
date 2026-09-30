@@ -248,7 +248,7 @@ const scratch = document.createElement('canvas');
  * @param {boolean} teamMode
  * @returns {Promise<Placement[]>}
  */
-export async function processResultsScreen(canvas, nameRects, roster, teamMode=false) {
+export async function processResultsScreen(canvas, nameRects, roster, teamMode=false, excludeIds=new Set()) {
 	const dbg = isDebugMode() ? startNewDebugReport() : null;
 	const whitelist = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -',
 		levCosts = { ins: 3, del: 1, sub: 2 },
@@ -305,7 +305,7 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	}
 
 	// Prepare normalized data
-	const rosterArray = [...roster];
+	const rosterArray = [...roster].filter(p => !excludeIds.has(p.id));
 	const placements = rawRows.map((row, i) => new Placement(i + 1, null, row.text, row.text, Math.round(row.confidence), false, roster.is24p));
 	const normRows = rawRows.map(r => normalizeName(r.text));
 

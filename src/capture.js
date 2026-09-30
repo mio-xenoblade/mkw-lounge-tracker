@@ -92,7 +92,7 @@ export async function captureResultsScreen(video, mogi) {
 			// Capture the second half of a 24p race
 			const base = captureFrame(video);
 			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, mogi.playersPerTeam >= 3);
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, mogi.playersPerTeam >= 3, new Set(temp24PlayerResults.placements.map(p => p.playerId)));
 			const combinedPlacements = [
 				...temp24PlayerResults.placements,
 				...placements.map(place => place.withPlacement(place.placement + 12, place.dc))
