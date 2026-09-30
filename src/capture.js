@@ -88,11 +88,13 @@ let temp24PlayerResults = null;
  */
 export async function captureResultsScreen(video, mogi) {
 	try {
+		const teamsEnabled = mogi.roster.is24p ? mogi.playersPerTeam >= 6 : mogi.playersPerTeam >= 3;
 		if (temp24PlayerResults !== null) {
 			// Capture the second half of a 24p race
 			const base = captureFrame(video);
 			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, mogi.playersPerTeam >= 3, new Set(temp24PlayerResults.placements.map(p => p.playerId)));
+			const excludedIds = new Set(temp24PlayerResults.placements.map(p => p.playerId));
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, teamsEnabled, excludedIds);
 			const combinedPlacements = [
 				...temp24PlayerResults.placements,
 				...placements.map(place => place.withPlacement(place.placement + 12, place.dc))
@@ -108,7 +110,7 @@ export async function captureResultsScreen(video, mogi) {
 		else {
 			const base = captureFrame(video);
 			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-			const placements = await processResultsScreen(base, OCR_GRID.nameRectsTop12, mogi.roster, mogi.playersPerTeam >= 3);
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsTop12, mogi.roster, teamsEnabled);
 			// Only if successful, make the snapshot and push the race
 			const snapshotUrlTop12 = await snapshotBlobUrlFromCanvas(base);
 			const race = new Race(Date.now(), placements, snapshotUrlTop12);
