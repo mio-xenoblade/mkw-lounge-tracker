@@ -152,7 +152,7 @@ export async function capturePauseScreen(video, mogi) {
 	try {
 		const base = captureFrame(video);
 		// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-		const placements = await processResultsScreen(base, OCR_GRID.pauseRects, mogi.roster);
+		const placements = await processResultsScreen(base, mogi.roster.is24p ? OCR_GRID.pauseRects24p : OCR_GRID.pauseRects12p, mogi.roster);
 		return placements;
 	} catch (e) {
 		// If the user canceled manual resolve, just abort quietly
