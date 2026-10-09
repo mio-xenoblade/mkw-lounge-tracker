@@ -23,7 +23,7 @@ export default {
 				"Export Lounge"
 			],
 			steps: [
-				"**1.** Cliquez sur __Commencer__ et collez la liste des 12 joueurs (`1. Nom (12345 MMR)`).",
+				"**1.** Cliquez sur __Commencer__ et collez la liste des 12 ou 24 joueurs (`1. Nom (12345 MMR)`).",
 				"**2.** Choisissez votre webcam virtuelle dans l'aperçu.",
 				"**3.** Après chaque course, appuyez sur __Capturer & OCR__. Appariage automatique ; en cas de doute, on vous demandera.",
 				"**4.** Corrigez via __Modifier__ → __Enregistrer__. Exportez les scores quand c'est fini."
@@ -31,9 +31,9 @@ export default {
 			getStartedButton: "🚀 Commencer",
 			notesLabel: "Notes",
 			notes: [
-				"La course 1 doit inclure les 12 joueurs.",
-				"Les courses à 10 joueurs sont valides ; 9 ou moins ⇒ à refaire.",
-				"Prend en charge les formats FFA, 2v2, 3v3, 4v4 et 6v6 de la file Lounge.",
+				"La course 1 doit inclure tous les joueurs.",
+				"Pour les mogis à 12 joueurs: Les courses à 10 joueurs sont valides ; 9 ou moins ⇒ à refaire.",
+				"Prend en charge les formats FFA, 2v2, 3v3, 4v4, 6v6, 8v8 et 12v12 de la file Lounge.",
 				"Tout reste local dans votre navigateur.",
 				"Auto-capture : détecte la capture d'écran sur la Switch et l'enregistre automatiquement."
 			],
@@ -73,7 +73,8 @@ export default {
 			noScoreboardDetected: "Aucun tableau de scores détecté — capturez l'écran des résultats.",
 			noPauseScreenDetected: "Échec du remplissage automatique — ouvrez l'écran Pause avec au moins 10 joueurs présents.",
 			ocrFailed: "Échec de l'OCR. Voir la console pour plus de détails.",
-			raceSaved: "Course {number} enregistrée !"
+			raceSaved: "Course {number} enregistrée !",
+			capturedHalf: "Les 12 premiers joueurs ont été sélectionnés ; veuillez sélectionner la deuxième moitié."			
 		},
 
 		overlay: {

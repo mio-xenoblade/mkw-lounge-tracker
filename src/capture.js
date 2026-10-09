@@ -88,7 +88,7 @@ let temp24PlayerResults = null;
  */
 export async function captureResultsScreen(video, mogi) {
 	try {
-		const teamsEnabled = mogi.roster.is24p ? mogi.playersPerTeam >= 6 : mogi.playersPerTeam >= 3;
+		const teamsEnabled = mogi.playersPerTeam >= mogi.roster.size / 4;
 		if (temp24PlayerResults !== null) {
 			// Capture the second half of a 24p race
 			const base = captureFrame(video);
@@ -117,7 +117,7 @@ export async function captureResultsScreen(video, mogi) {
 			if (mogi.roster.is24p) {
 				temp24PlayerResults = race;
 				//TODO: add translations
-				info('Captured 12/24, please capture second half')
+				info(t('capture.capturedHalf'))
 				return;
 			}
 			mogi.roster.lockIGNsFromPlacements(placements);

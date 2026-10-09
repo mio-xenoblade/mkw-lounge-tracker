@@ -12,7 +12,7 @@ export const TEAM_COLOURS = [
 	"#f86a2e",
 	"#4cbb17",
 	"#fc78ed",
-	"#f83939",
+	"#ff1a1a",
 	"#ffdb03",
 	"#ebece9"
 ];

@@ -23,7 +23,7 @@ export default {
 				"Lounge-Export"
 			],
 			steps: [
-				"**1.** Klicke **Los geht's** und füge die 12-Spieler-Liste ein (`1. Name (12345 MMR)`)",
+				"**1.** Klicke **Los geht's** und füge die 12- oder 24-Spieler-Liste ein (`1. Name (12345 MMR)`)",
 				"**2.** Wähle deine virtuelle Webcam in der Vorschau.",
 				"**3.** Nach jedem Rennen **Aufnehmen & OCR** drücken. Zuordnung passiert automatisch; bei Unsicherheit wirst du gefragt.",
 				"**4.** Korrigiere über **Bearbeiten** → **Speichern**. Am Ende Punkte exportieren."
@@ -31,9 +31,9 @@ export default {
 			getStartedButton: "🚀 Los geht's",
 			notesLabel: "Hinweise",
 			notes: [
-				"Rennen 1 muss alle 12 Spieler enthalten.",
-				"10-Spieler-Rennen sind gültig; 9 oder weniger ⇒ Neustart.",
-				"Unterstützt FFA-, 2v2-, 3v3-, 4v4- und 6v6-Lounge-Queue-Formate.",
+				"Rennen 1 muss alle Spieler enthalten.",
+				"Für 12-Spieler-Mogis: 10-Spieler-Rennen sind gültig; 9 oder weniger ⇒ Neustart.",
+				"Unterstützt FFA-, 2v2-, 3v3-, 4v4-, 6v6-, 8v8- und 12v12-Lounge-Queue-Formate.",
 				"Alles bleibt lokal in deinem Browser.",
 				"Auto-Capture: erkennt den Ergebnisscreen der Switch und speichert automatisch."
 			],
@@ -73,7 +73,8 @@ export default {
 			noScoreboardDetected: "Kein Ergebnisscreen erkannt — bitte den Ergebnisscreen erfassen.",
 			noPauseScreenDetected: "Automatisches Ausfüllen fehlgeschlagen — bitte den Pausebildschirm mit mindestens 10 anwesenden Spielern öffnen.",
 			ocrFailed: "OCR fehlgeschlagen. Details in der Konsole.",
-			raceSaved: "Rennen {number} gespeichert!"
+			raceSaved: "Rennen {number} gespeichert!",
+			capturedHalf: "Die ersten 12 Spieler wurden erfasst, bitte erfassen Sie nun die zweite Hälfte."
 		},
 
 		overlay: {
