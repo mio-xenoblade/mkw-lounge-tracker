@@ -22,7 +22,7 @@ export default {
 				"Lounge export"
 			],
 			steps: [
-				"**1.** Click __Get started__ and paste the 12-player roster (`1. Name (12345 MMR)`).",
+				"**1.** Click __Get started__ and paste the 12 or 24-player roster (`1. Name (12345 MMR)`).",
 				"**2.** Pick your virtual webcam in the preview area.",
 				"**3.** After each race, hit __Capture & OCR__. We'll auto-match; if unsure, we'll ask.",
 				"**4.** Fix anything via __Edit__ → __Save__. Export scores when done."
@@ -30,15 +30,15 @@ export default {
 			getStartedButton: "🚀 Get started",
 			notesLabel: "Notes",
 			notes: [
-				"Race 1 must include all 12 players.",
-				"10-player races are valid; 9 or fewer are a redo.",
-				"Supports FFA, 2v2, 3v3, 4v4 and 6v6 Lounge Queue formats.",
+				"Race 1 must include all players.",
+				"For 12-player events: 10-player races are valid; 9 or fewer are a redo.",
+				"Supports FFA, 2v2, 3v3, 4v4, 6v6, 8v8 and 12v12 Lounge Queue formats.",
 				"Everything stays local in your browser.",
 				"Auto-capture: detects when you take a screenshot on your Switch and automatically captures it."
 			],
 			aboutLabel: "About",
 			about: [
-				"Made by [Niet](https://github.com/PFQNiet); Contributors: TechyAlex",
+				"Made by [Niet](https://github.com/PFQNiet); Contributors: TechyAlex, Mio Xenoblade",
 				"[View source on GitHub](https://github.com/PFQNiet/mkw-lounge-tracker)",
 				"[Report a bug](https://github.com/PFQNiet/mkw-lounge-tracker/issues)"
 			]
@@ -70,7 +70,8 @@ export default {
 			noScoreboardDetected: "No scoreboard detected — try capturing on the results screen.",
 			noPauseScreenDetected: "Auto-fill failed — ensure Pause screen is open with at least 10 players present.",
 			ocrFailed: "OCR failed. See console for details.",
-			raceSaved: "Race {number} saved!"
+			raceSaved: "Race {number} saved!",
+			capturedHalf: "Captured first 12 players, please capture second half"
 		},
 		overlay: {
 			connected: "Overlay connected",

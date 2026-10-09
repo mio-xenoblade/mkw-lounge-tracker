@@ -8,7 +8,13 @@ export const TEAM_COLOURS = [
 	"#f69a12",
 	"#008071",
 	"#8e3eb4",
-	"#00a6d6"
+	"#00a6d6",
+	"#f86a2e",
+	"#4cbb17",
+	"#fc78ed",
+	"#ff1a1a",
+	"#ffdb03",
+	"#ebece9"
 ];
 
 export const TEAM_ICONS = [
@@ -17,7 +23,13 @@ export const TEAM_ICONS = [
 	"🦍",
 	"🌌",
 	"💰",
-	"🦖"
+	"🦖",
+	"🌼",
+	"🍀",
+	"🎀",
+	"👺",
+	"🐛",
+	"🐮"
 ];
 
 export class Team {

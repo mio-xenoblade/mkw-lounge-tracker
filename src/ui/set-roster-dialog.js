@@ -1,14 +1,15 @@
 import { t } from "../i18n/i18n.js";
-import { Roster, ROSTER_SIZE } from "../roster.js";
+import { Roster, MAX_ROSTER_SIZE } from "../roster.js";
 import { error, success } from "./toast.js";
+
 
 function makeDialog() {
 	const dialog = document.createElement('dialog');
 	dialog.innerHTML = `
 		<form method="dialog" class="modal">
 			<h3>${t('rosterSetup.title')}</h3>
-			<p class="muted">${t('rosterSetup.instructions', { count: ROSTER_SIZE })}</p>
-			<textarea rows="${ROSTER_SIZE}" placeholder="Room 1 MMR: 9999 - Tier A&#xA;1. Player1, Player2 (9999 MMR)&#xA;...&#xA;&#xA;-- or for a war --&#xA;&#xA;WAR - Tag1 vs Tag2&#xA;1. P1, P2, P3, P4, P5, P6&#xA;2. P7, P8, P9, P10, P11, P12"></textarea>
+			<p class="muted">${t('rosterSetup.instructions', { count: MAX_ROSTER_SIZE })}</p>
+			<textarea rows="${MAX_ROSTER_SIZE}" placeholder="Room 1 MMR: 9999 - Tier A&#xA;1. Player1, Player2 (9999 MMR)&#xA;...&#xA;&#xA;-- or for a war --&#xA;&#xA;WAR - Tag1 vs Tag2&#xA;1. P1, P2, P3, P4, P5, P6&#xA;2. P7, P8, P9, P10, P11, P12"></textarea>
 			<footer>
 				<button type="button" class="btn--primary">${t('confirm')}</button>
 			</footer>
@@ -34,7 +35,7 @@ export function requestRoster(btn) {
 			confirm.addEventListener('click', () => {
 				try {
 					const roster = Roster.parse(input.value);
-					if( !roster.full ) throw new Error(t('rosterSetup.wrongLength', { count: ROSTER_SIZE, actual: roster.size }));
+					if( ![MAX_ROSTER_SIZE / 2,MAX_ROSTER_SIZE].includes(roster.size) ) throw new Error(t('rosterSetup.wrongLength', { count: MAX_ROSTER_SIZE, actual: roster.size }));
 					dialog.close();
 					success(t('rosterSetup.rosterLoaded'));
 					resolve(roster);

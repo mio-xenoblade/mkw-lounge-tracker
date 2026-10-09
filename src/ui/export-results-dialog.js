@@ -1,16 +1,18 @@
 /** @typedef {import("../mogi.js").Mogi} Mogi */
 import { exportZip } from "../export-zip.js";
 import { t } from "../i18n/i18n.js";
-import { ROSTER_SIZE } from "../roster.js";
 import { toLetter } from "../util.js";
 import { success, warning } from "./toast.js";
 
-function makeDialog() {
+/**
+ * @param {number} rosterSize
+ */
+function makeDialog(rosterSize) {
 	const dialog = document.createElement('dialog');
 	dialog.innerHTML = `
 		<form method="dialog" class="modal">
 			<h3>${t('exportScores.title')}</h3>
-			<textarea rows="${ROSTER_SIZE+1}" readonly></textarea>
+			<textarea rows="${rosterSize+1}" readonly></textarea>
 			<footer>
 				<button value="cancel">${t('exportScores.close')}</button>
 				<button value="copy" type="button" class="btn--primary">${t('exportScores.copy')}</button>
@@ -50,14 +52,14 @@ function formatResults(mogi, mode="q") {
 		const score = scores.get(p.id) ?? 0;
 		const rank = scoresArray.filter(x => x > score).length + 1;
 		return (mogi.playersPerTeam > 1 && i % mogi.playersPerTeam === 0 && mode === "sq" ? `Team ${p.seed} - ${mogi.teamBySeed(p.seed)?.tag || toLetter(p.seed)}\n` : '')
-			+ `${p.nameOfPlayerToCredit(rank)} ${mode === "sq" ? '[] ' : ''}${score}`
+			+ `${p.nameOfPlayerToCredit(rank, mogi.roster.size)} ${mode === "sq" ? '[] ' : ''}${score}`
 			+ (mogi.playersPerTeam > 1 && (i+1) % mogi.playersPerTeam === 0 ? '\n' : '');
 	}).join('\n').trim();
 }
 
 /** @param {Mogi} mogi */
 function showResults(mogi) {
-	const { dialog, output, close, copy } = makeDialog();
+	const { dialog, output, close, copy } = makeDialog(mogi.roster.size);
 	output.value = mogi.roster.isWar ? formatWarResults(mogi) : formatResults(mogi);
 	output.rows = output.value.split('\n').length;
 	dialog.showModal();

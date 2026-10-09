@@ -50,6 +50,7 @@ function createGridHost(container) {
 function createTeamRow(grid, team) {
 	const name = document.createElement('b');
 	name.textContent = t('editRoster.team', { id: team.seed });
+	const copyNameButton = document.createElement('b');
 	const tag = document.createElement('input');
 	tag.name = 'tag';
 	tag.autocomplete = "off";
@@ -65,7 +66,7 @@ function createTeamRow(grid, team) {
 		colour.add(opt);
 	}
 	colour.dataset.previousValue = colour.value = String(team.index);
-	grid.append(name, tag, colour);
+	grid.append(name, copyNameButton, tag, colour);
 }
 
 /**

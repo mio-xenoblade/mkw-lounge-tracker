@@ -3,7 +3,6 @@
 
 import { captureResultsScreen } from "../capture.js";
 import { t } from "../i18n/i18n.js";
-import { ROSTER_SIZE } from "../roster.js";
 import { Config } from "../util.js";
 import { error, info, success, warning } from "./toast.js";
 
@@ -86,17 +85,18 @@ export function setupCaptureButton(captureButton, video, resultsList, mogi) {
 
 	mogi.addEventListener('update', () => {
 		const latest = mogi.races.at(-1);
-		if (!latest) renderEmptyResults(resultsList);
+		if (!latest) renderEmptyResults(resultsList, mogi.roster.size);
 		else renderResults(resultsList, latest.placements, mogi);
 	});
 }
 
 /**
  * @param {HTMLOListElement} resultsList
+ * @param {number} rosterSize
  */
-function renderEmptyResults(resultsList) {
+function renderEmptyResults(resultsList, rosterSize) {
 	resultsList.innerHTML = '';
-	for( let i=0; i<ROSTER_SIZE; i++) {
+	for( let i=0; i<rosterSize; i++) {
 		const li = document.createElement('li');
 		const rank = document.createElement('span');
 		rank.className = 'mono';

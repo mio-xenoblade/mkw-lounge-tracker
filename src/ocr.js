@@ -103,10 +103,11 @@ function generateRowRects(p) {
 export const OCR_GRID = {
 	canvasWidth: 1920,
 	canvasHeight: 1080,
-	nameRects: generateRowRects({ count: 12, startY: 40, rowHeight: 77, vPad: 15, x: 1270, w: 340 }),
+	nameRectsTop12: generateRowRects({ count: 12, startY: 40, rowHeight: 77, vPad: 15, x: 1270, w: 340 }),
+	nameRectsBottom12: generateRowRects({ count: 12, startY: 117, rowHeight: 77, vPad: 15, x: 1270, w: 340 }),
 	pauseRects: [
-		...generateRowRects({ count: 6, startY: 14, rowHeight: 76, vPad: 15, x: 260, w: 240 }),
-		...generateRowRects({ count: 6, startY: 14, rowHeight: 76, vPad: 15, x: 670, w: 240 }),
+		...generateRowRects({ count: 12, startY: 14, rowHeight: 76, vPad: 15, x: 260, w: 240 }),
+		...generateRowRects({ count: 12, startY: 14, rowHeight: 76, vPad: 15, x: 670, w: 240 }),
 	]
 };
 
@@ -145,44 +146,90 @@ function levenshteinWeighted(a, b, w = { ins: 1, del: 1, sub: 1 }) {
 }
 
 /**
- * Solve the assignment (player i -> row j) minimizing total integer costs.
- * @param {number[][]} cost - NxN matrix where cost[i][j] is the cost to map player i to row j
- * @returns {number[]} assignment array A of length N where A[i] = j (row index for player i)
+ * Solve a rectangular assignment problem.
+ *
+ * Every OCR row gets assigned to exactly one player, while players
+ * that do not appear on the scoreboard remain unassigned.
+ *
+ * @param {number[][]} cost - players x OCR rows
+ * @returns {number[]} assignment array A where A[playerIndex] = ocrRowIndex,
+ *                     or -1 if that player was not assigned an OCR row.
  */
 function solveAssignmentDP(cost) {
-	const n = cost.length, SIZE = 1 << n;
-	/** @type {number[]} */ const dp = new Array(SIZE).fill(Infinity);
-	/** @type {number[]} */ const parent = new Array(SIZE).fill(-1);
-	/** @type {number[]} */ const choice = new Array(SIZE).fill(-1);
-	dp[0] = 0;
+	const playerCount = cost.length;
+	if (playerCount === 0) return [];
+	const rowCount = cost[0]?.length ?? 0;
+	if (rowCount === 0) {
+		return new Array(playerCount).fill(-1);
+	}
 
-	for (let mask = 0; mask < SIZE; mask++) {
-		const i = popcount(mask);                 // next player index
-		if (i >= n) continue;
-		const base = dp[mask] ?? NaN;
-		for (let j = 0; j < n; j++) {
-			if (mask & (1 << j)) continue;          // row j already used
-			const cell = cost[i]?.[j] ?? NaN;
-			const m2 = mask | (1 << j);
-			const val = base + cell;
-			if (val < (dp[m2] ?? NaN)) {
-				dp[m2] = val;
-				parent[m2] = mask;
-				choice[m2] = j;
+	const rowCountForHungarian = rowCount;
+	const colCountForHungarian = playerCount;
+
+	// Hungarian algorithm for minimum-cost assignment where
+	// rows <= columns.
+	const u = new Array(rowCountForHungarian + 1).fill(0);
+	const v = new Array(colCountForHungarian + 1).fill(0);
+	const p = new Array(colCountForHungarian + 1).fill(0);
+	const way = new Array(colCountForHungarian + 1).fill(0);
+
+	for (let i = 1; i <= rowCountForHungarian; i++) {
+		p[0] = i;
+		let j0 = 0;
+		const minv = new Array(colCountForHungarian + 1).fill(Infinity);
+		const used = new Array(colCountForHungarian + 1).fill(false);
+		do {
+			used[j0] = true;
+			const i0 = p[j0];
+			let delta = Infinity;
+			let j1 = 0;
+
+			for (let j = 1; j <= colCountForHungarian; j++) {
+				if (used[j]) continue;
+				const cur =
+					cost[j - 1][i0 - 1] -
+					u[i0] -
+					v[j];
+				if (cur < minv[j]) {
+					minv[j] = cur;
+					way[j] = j0;
+				}
+				if (minv[j] < delta) {
+					delta = minv[j];
+					j1 = j;
+				}
 			}
-		}
+			for (let j = 0; j <= colCountForHungarian; j++) {
+				if (used[j]) {
+					u[p[j]] += delta;
+					v[j] -= delta;
+				}
+				else {
+					minv[j] -= delta;
+				}
+			}
+			j0 = j1;
+		} while (p[j0] !== 0);
+
+		// Augmenting path.
+		do {
+			const j1 = way[j0];
+			p[j0] = p[j1];
+			j0 = j1;
+		} while (j0 !== 0);
 	}
 
 	// reconstruct
-	const assign = new Array(n).fill(-1);
-	let mask = SIZE - 1;
-	for (let i = n - 1; i >= 0; i--) {
-		const j = choice[mask];
-		assign[i] = j;
-		mask = parent[mask] ?? NaN;
+	const assign = new Array(playerCount).fill(-1);
+	for (let j = 1; j <= colCountForHungarian; j++) {
+		const ocrRow = p[j];
+		if (ocrRow > 0) {
+			assign[j - 1] = ocrRow - 1;
+		}
 	}
 	return assign;
 }
+
 
 let _worker = /** @type {any} */(null);
 async function getWorker() {
@@ -201,7 +248,7 @@ const scratch = document.createElement('canvas');
  * @param {boolean} teamMode
  * @returns {Promise<Placement[]>}
  */
-export async function processResultsScreen(canvas, nameRects, roster, teamMode=false) {
+export async function processResultsScreen(canvas, nameRects, roster, teamMode=false, excludeIds=new Set()) {
 	const dbg = isDebugMode() ? startNewDebugReport() : null;
 	const whitelist = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -',
 		levCosts = { ins: 3, del: 1, sub: 2 },
@@ -258,8 +305,8 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	}
 
 	// Prepare normalized data
-	const rosterArray = [...roster];
-	const placements = rawRows.map((row, i) => new Placement(i + 1, null, row.text, row.text, Math.round(row.confidence), false));
+	const rosterArray = [...roster].filter(p => !excludeIds.has(p.id));
+	const placements = rawRows.map((row, i) => new Placement(i + 1, null, row.text, row.text, Math.round(row.confidence), false, roster.is24p));
 	const normRows = rawRows.map(r => normalizeName(r.text));
 
 	// Early exit if 2+ blanks
@@ -272,19 +319,20 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	}
 
 	// Build an integer cost matrix: players (rows) × OCR rows (cols)
-	const N = rosterArray.length; // expect 12
+	const playerCount = rosterArray.length;
+	const ocrRows = normRows.length;
 	const isBlankCol = normRows.map(s => !s);
 
 	// Use IGN if available, else roster name, for each player
 	const targetNorm = rosterArray.map(p => normalizeName(p.activePlayer.ign));
 
 	/** @type {number[][]} */
-	const cost = Array.from({ length: N }, () => Array(N).fill(0));
+	const cost = Array.from({ length: playerCount }, () => Array(ocrRows).fill(0));
 
 	let maxNonBlankCost = 0;
 	// Pass 1: fill non-blank base costs and track the maximum seen
-	for (let i = 0; i < N; i++) {
-		for (let j = 0; j < N; j++) {
+	for (let i = 0; i < playerCount; i++) {
+		for (let j = 0; j < ocrRows; j++) {
 			if (isBlankCol[j]) continue;
 			const d = levenshteinWeighted(targetNorm[i], normRows[j], levCosts);
 			cost[i][j] = d;
@@ -302,18 +350,18 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	}
 
 	// Pass 2: assign blank costs
-	for (let i = 0; i < N; i++) {
-		for (let j = 0; j < N; j++) {
+	for (let i = 0; i < playerCount; i++) {
+		for (let j = 0; j < ocrRows; j++) {
 			if (isBlankCol[j]) cost[i][j] = BLANK_COST;
 		}
 	}
 
 	// Pass 3: if a row exactly matches a known IGN, heavily penalize assigning it to anyone else.
-	for (let j = 0; j < N; j++) {
+	for (let j = 0; j < ocrRows; j++) {
 		if (isBlankCol[j]) continue;
 		const owner = targetNorm.indexOf(normRows[j]);
 		if (owner < 0) continue;
-		for (let i = 0; i < N; i++) {
+		for (let i = 0; i < playerCount; i++) {
 			if (i === owner) continue;
 			cost[i][j] += IGN_MISMATCH_PENALTY;
 		}
@@ -325,12 +373,21 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	if( dbg ) dbg.assignment = [...assign];
 
 	// Apply assignment (invert to fill per-row placements) and record distances
-	/** @type {number[]} */ const assignedDist = new Array(N).fill(0);
-	for (let i = 0; i < N; i++) {
+	/** @type {number[]} */ const assignedDist = new Array(ocrRows).fill(0);
+	for (let i = 0; i < playerCount; i++) {
 		const j = assign[i];
-		placements[j] = placements[j].withPlayerIdAndResolvedName(rosterArray[i].id, rosterArray[i].activePlayer.name);
+
+		// This player isn't in the 12 OCR rows.
+		if (j < 0) continue;
+
+		placements[j] = placements[j].withPlayerIdAndResolvedName(
+			rosterArray[i].id,
+			rosterArray[i].activePlayer.name
+		);
+
 		assignedDist[j] = cost[i][j];
-		if( dbg && dbg.rows[j] ) {
+
+		if (dbg && dbg.rows[j]) {
 			dbg.rows[j].assignedTo = rosterArray[i].id;
 			dbg.rows[j].assignedDistance = assignedDist[j];
 		}
@@ -339,7 +396,7 @@ export async function processResultsScreen(canvas, nameRects, roster, teamMode=f
 	// Ambiguity handling:
 	//  - Mark blank rows as disconnected
 	//  - If a row has *non-blank* OCR and its assigned distance exceeds maxEditDistance, revoke assignment
-	for (let j = 0; j < N; j++) {
+	for (let j = 0; j < ocrRows; j++) {
 		const isBlank = !normRows[j];
 		if (isBlank) {
 			placements[j] = placements[j].withPlacement(placements[j].placement, true);

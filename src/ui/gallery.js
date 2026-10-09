@@ -15,15 +15,20 @@ export function connectGallery(raceGallery, mogi) {
 			const race = i < races.length ? races[i] : null;
 			const a = document.createElement('a');
 			if( race) {
-				a.href = race.snapshotUrl; a.target = '_blank'; a.rel = 'noreferrer';
+				for (let j = 0; j < race.snapshotUrls.length; j++) {
+					a.href = race.snapshotUrls[j]; a.target = '_blank'; a.rel = 'noreferrer';
+					const img = document.createElement('img');
+					img.alt = t('gallery.imageAltText', { number: i + 1 });
+					img.src = race ? race.snapshotUrls[j] : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==';
+					const cap = document.createElement('div');
+					cap.className = 'cap';
+					//only add timestamp to final screenshot
+					if (j === race.snapshotUrls.length-1){				
+						cap.textContent = t('gallery.imageCaption', { number: i + 1, time: race ? fmt.time(new Date(race.timestamp)) : t('blank') });
+					}
+					a.append(img, cap);
+				}
 			}
-			const img = document.createElement('img');
-			img.alt = t('gallery.imageAltText', { number: i + 1 });
-			img.src = race ? race.snapshotUrl : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==';
-			const cap = document.createElement('div');
-			cap.className = 'cap';
-			cap.textContent = t('gallery.imageCaption', { number: i + 1, time: race ? fmt.time(new Date(race.timestamp)) : t('blank') });
-			a.append(img, cap);
 			raceGallery.appendChild(a);
 		}
 	});

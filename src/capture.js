@@ -76,20 +76,53 @@ export function snapshotBlobUrlFromCanvas(base) {
 }
 
 /**
+ * Temporarily store results of the first part of a 24p race, so it can be used again later
+ * @type {Race | null}
+ */
+let temp24PlayerResults = null;
+
+/**
  * Capture a frame and OCR the results screen.
  * @param {HTMLVideoElement} video
  * @param {Mogi} mogi
  */
 export async function captureResultsScreen(video, mogi) {
 	try {
-		const base = captureFrame(video);
-		// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
-		const placements = await processResultsScreen(base, OCR_GRID.nameRects, mogi.roster, mogi.playersPerTeam >= 3);
-		// Only if successful, make the snapshot and push the race
-		const snapshotUrl = await snapshotBlobUrlFromCanvas(base);
-		const race = new Race(Date.now(), placements, snapshotUrl);
-		mogi.roster.lockIGNsFromPlacements(placements);
-		mogi.addRace(race);
+		const teamsEnabled = mogi.playersPerTeam >= mogi.roster.size / 4;
+		if (temp24PlayerResults !== null) {
+			// Capture the second half of a 24p race
+			const base = captureFrame(video);
+			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
+			const excludedIds = new Set(temp24PlayerResults.placements.map(p => p.playerId));
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsBottom12, mogi.roster, teamsEnabled, excludedIds);
+			const combinedPlacements = [
+				...temp24PlayerResults.placements,
+				...placements.map(place => place.withPlacement(place.placement + 12, place.dc))
+				
+			];
+			// Only if successful, make the snapshot and push the race
+			const snapshotUrlBottom12 = await snapshotBlobUrlFromCanvas(base);
+			const totalResults = new Race(Date.now(), combinedPlacements, ...temp24PlayerResults.snapshotUrls, snapshotUrlBottom12);
+			temp24PlayerResults = null;
+			mogi.roster.lockIGNsFromPlacements(placements)
+			mogi.addRace(totalResults)
+		}
+		else {
+			const base = captureFrame(video);
+			// this may throw MANUAL_CANCELLED or NO_SCOREBOARD
+			const placements = await processResultsScreen(base, OCR_GRID.nameRectsTop12, mogi.roster, teamsEnabled);
+			// Only if successful, make the snapshot and push the race
+			const snapshotUrlTop12 = await snapshotBlobUrlFromCanvas(base);
+			const race = new Race(Date.now(), placements, snapshotUrlTop12);
+			if (mogi.roster.is24p) {
+				temp24PlayerResults = race;
+				//TODO: add translations
+				info(t('capture.capturedHalf'))
+				return;
+			}
+			mogi.roster.lockIGNsFromPlacements(placements);
+			mogi.addRace(race);
+		}
 	} catch (e) {
 		// If the user canceled manual resolve, just abort quietly
 		if (/** @type {any} */(e)?.code === 'MANUAL_CANCELLED') {

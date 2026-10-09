@@ -1,5 +1,9 @@
 # MKW Mogi Manager
 
+## Fork information
+
+My goal with this fork is to get more used to reading and editing code from other people. The feature I want to add is support for 24 player events. If that goes well, maybe adding support for multi rally KO-tour events as well.
+
 ## Overview
 
 **MKW Mogi Manager** is a tool to simplify tracking scores during competitive **Mario Kart World Lounge mogis**. Instead of manually writing down results, the app captures screenshots of the scoreboard, reads the names and scores, and keeps track of everything automatically. At the end of the session, you can export results in the format needed for **Lounge Discord bots**, along with a full package of screenshots and race data for reference.
