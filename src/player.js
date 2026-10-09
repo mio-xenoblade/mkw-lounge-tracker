@@ -3,7 +3,6 @@
  */
 
 import { RACE_COUNT } from "./mogi.js";
-import { ROSTER_SIZE } from "./roster.js";
 
 /**
  * @param {string & {normalized?:never}} s
@@ -48,8 +47,11 @@ export class Player {
 	/** @returns {Player|Substitute} */
 	get activePlayer() { return this.#substitutes.at(-1) ?? this; }
 
-	/** @param {number} pos */
-	nameOfPlayerToCredit(pos) {
+	/** 
+	 * @param {number} pos 
+	 * @param {number} rosterSize
+	*/
+	nameOfPlayerToCredit(pos, rosterSize) {
 		// Rule 6 d: Players who substitute into an event:
 		// i. Will receive normal MMR gains/losses if they substitute in before the first race has been completed.
 		// ii. Do not lose MMR on a losing team if they substitute in after the first race has been completed.
@@ -58,7 +60,7 @@ export class Player {
 		const p = this.activePlayer;
 		if( p instanceof Player) return this.name; // original player
 		if( p.joinedAt === 0) return p.name; // played all races, gets credit according to 6.d.i.
-		if( pos <= ROSTER_SIZE/2) {
+		if( pos <= rosterSize/2) {
 			// winning position
 			return RACE_COUNT - p.joinedAt >= 4 ? p.name : this.name; // must play 4 or more races to get credit according to 6.d.iii.
 			// TODO: Seek clarification on Rule 6.e. on how to report scores for players who did not play 4 or more races

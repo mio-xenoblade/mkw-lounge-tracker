@@ -2,11 +2,13 @@
 /** @typedef {import("../race.js").Placement} Placement */
 
 import { fmt, t } from "../i18n/i18n.js";
-import { ROSTER_SIZE } from "../roster.js";
 
-const MAX_DC_SLOTS = 4;
+const MAX_DC_SLOTS = 2;
 
-function makeDialog() {
+/**
+ * @param {number} rosterSize
+ */
+function makeDialog(rosterSize) {
 	const dialog = document.createElement('dialog');
 	dialog.innerHTML = `
 		<form method="dialog" class="modal">
@@ -14,7 +16,7 @@ function makeDialog() {
 			<div class="grid" style="grid-template-columns: 1fr 220px;">
 				<div class="race-screenshots"></div>
 				<div class="editrace-list">
-					${Array.from({length:ROSTER_SIZE}).map((_, i) => `<label>
+					${Array.from({length:rosterSize}).map((_, i) => `<label>
 						<input type="checkbox" />
 						<span class="place mono">${fmt.place(i+1)}</span>
 						<span class="name"></span>
@@ -66,7 +68,7 @@ function makeDialog() {
 export function openEditRace(mogi, idx) {
 	const race = mogi.races[idx];
 	if( !race) return;
-	const { dialog, slots, screenshots, save, cancel, del } = makeDialog();
+	const { dialog, slots, screenshots, save, cancel, del } = makeDialog(mogi.roster.size);
 
 	race.snapshotUrls.forEach((url, i) => {
 		const link = document.createElement('a');
@@ -91,7 +93,7 @@ export function openEditRace(mogi, idx) {
 		const place = row.placement;
 		const isDC = row.dc;
 		const name = p.activePlayer.name;
-		const slot = isDC ? slots[ROSTER_SIZE + dcCount++] : slots[place - 1];
+		const slot = isDC ? slots[mogi.roster.size + dcCount++] : slots[place - 1];
 		if( mogi.playersPerTeam > 1) {
 			const team = mogi.teamBySeed(p.seed);
 			if( team) slot.style.background = `${team.colour}40`;
@@ -108,7 +110,7 @@ export function openEditRace(mogi, idx) {
 		slots.forEach((sel,i) => {
 			const pid = sel.dataset.playerId || '';
 			if( !pid ) return;
-			const val = i >= ROSTER_SIZE ? 'dc' : place++;
+			const val = i >= mogi.roster.size ? 'dc' : place++;
 			picks.set(pid, val);
 		});
 
